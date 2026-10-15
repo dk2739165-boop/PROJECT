@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Gemini — Full-Stack AI Chatbot with Supabase</title>
+  <meta name="description" content="A full-stack Gemini AI Chatbot with clean frontend and backend separation and Supabase database persistence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Highlight.js for Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <!-- Marked.js for Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Gradient Background -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- App Wrapper -->
+  <div class="app-layout">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <!-- Sidebar Toggle -->
+        <button id="sidebar-toggle-btn" class="nav-icon-btn" title="Toggle Chat History">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#sparkle-gradient)"/>
+              <defs>
+                <linearGradient id="sparkle-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#4E80EE"/>
+                  <stop offset="0.5" stop-color="#8F54FB"/>
+                  <stop offset="1" stop-color="#EA5297"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>Nexus <span>Gemini</span></h1>
+            <span class="brand-badge">Full-Stack + Supabase</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Model Selector -->
+        <div class="selector-wrapper">
+          <label for="model-select" class="sr-only">Select Model</label>
+          <select id="model-select" class="model-dropdown">
+            <option value="gemini-3.8-flash" selected>Gemini 3.8 Flash (Latest)</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Ultra Fast)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+          </select>
+        </div>
+
+        <!-- Architecture Breakdown Modal Trigger -->
+        <button id="arch-modal-btn" class="nav-btn" title="View Frontend vs Backend & Database Architecture">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+          <span>Architecture & .env</span>
+        </button>
+
+        <!-- Settings / Key Modal Trigger -->
+        <button id="settings-modal-btn" class="nav-btn" title="API Key, Supabase & Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span id="key-status-indicator" class="status-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Architecture Differentiation Banner -->
+    <div class="arch-banner" id="arch-banner">
+      <div class="banner-pill">
+        <span class="role frontend-role">Frontend Client</span>
+        <span class="arrow">&rarr;</span>
+        <span class="endpoint">POST /api/chat</span>
+        <span class="arrow">&rarr;</span>
+        <span class="role backend-role">Express Backend</span>
+        <span class="arrow">&harr;</span>
+        <span class="role db-role">Supabase DB</span>
+        <span class="arrow">&harr;</span>
+        <span class="role cloud-role">Google Gemini 2.5</span>
+      </div>
+      <div class="banner-hint">
+        Credentials safe in <code>.env</code> &bull; Sessions automatically saved to Supabase
+      </div>
+    </div>
+
+    <!-- Main Workspace (Sidebar + Chat Area) -->
+    <div class="workspace-layout">
+      <!-- Sidebar / Conversation History -->
+      <aside class="chat-sidebar" id="chat-sidebar">
+        <div class="sidebar-header">
+          <button id="new-chat-btn" class="btn btn-primary btn-new-chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>New Chat</span>
+          </button>
+        </div>
+
+        <div class="sidebar-section-title">
+          <span>Saved Conversations</span>
+          <span class="db-badge" id="sidebar-db-badge">Connecting...</span>
+        </div>
+
+        <div class="sessions-list" id="sessions-list">
+          <!-- Dynamic session items inserted by JS -->
+          <div class="empty-sessions-hint" id="empty-sessions-hint">
+            No saved sessions yet. Start a chat!
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="status-tag">
+            <span class="tag-dot" id="footer-db-dot"></span>
+            <span id="footer-db-text">Supabase: Checking...</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Chat Container -->
+      <main class="chat-container">
+        <div class="messages-scroll" id="messages-container">
+          <!-- Hero Welcome View (Shown when empty) -->
+          <div class="welcome-hero" id="welcome-hero">
+            <div class="hero-logo-ring">
+              <svg viewBox="0 0 24 24" fill="none" class="hero-gemini-icon">
+                <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#sparkle-hero)"/>
+                <defs>
+                  <linearGradient id="sparkle-hero" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#4E80EE"/>
+                    <stop offset="0.5" stop-color="#8F54FB"/>
+                    <stop offset="1" stop-color="#EA5297"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <h2>How can I assist you today?</h2>
+            <p class="hero-subtitle">
+              Powered by Google Gemini 2.5 &bull; Persistent history in Supabase PostgreSQL &bull; Secure Node.js proxy
+            </p>
+
+            <!-- Prompt Suggestions -->
+            <div class="quick-prompts">
+              <button class="prompt-chip" data-prompt="Explain how frontend .env and backend .env differ in security and purpose.">
+                <span class="chip-icon">🔐</span>
+                <span class="chip-text">Frontend vs Backend .env files</span>
+              </button>
+              <button class="prompt-chip" data-prompt="Show me an example SQL schema for storing AI chat conversations with foreign keys and indexes.">
+                <span class="chip-icon">🗄️</span>
+                <span class="chip-text">Chatbot database schema design</span>
+              </button>
+              <button class="prompt-chip" data-prompt="Write a Python script that analyzes CSV data and generates a summary report.">
+                <span class="chip-icon">🐍</span>
+                <span class="chip-text">Write a Python CSV analyzer</span>
+              </button>
+              <button class="prompt-chip" data-prompt="What makes Gemini 2.5 Flash fast and intelligent for real-time applications?">
+                <span class="chip-icon">⚡</span>
+                <span class="chip-text">What makes Gemini 2.5 special?</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Message History Appended Here -->
+        </div>
+
+        <!-- Typing / Processing Indicator -->
+        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+          <div class="bot-avatar-small">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="#8F54FB"/>
+            </svg>
+          </div>
+          <div class="typing-bubble">
+            <span class="typing-status-text">Gemini is reasoning</span>
+            <div class="dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Input Dock -->
+        <footer class="input-dock">
+          <form id="chat-form" class="chat-input-bar">
+            <button type="button" id="clear-chat-btn" class="dock-action-btn" title="Clear / Reset Current View">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+
+            <textarea 
+              id="user-input" 
+              rows="1" 
+              placeholder="Ask Gemini anything... (Shift + Enter for new line)"
+              autocomplete="off"
+            ></textarea>
+
+            <button type="submit" id="send-btn" class="send-btn" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+          <div class="dock-info">
+            <span>Press <kbd>Enter</kbd> to send</span> &bull; 
+            <span><kbd>Shift</kbd> + <kbd>Enter</kbd> for line break</span> &bull;
+            <span id="backend-status-text">Backend: Connecting...</span>
+          </div>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: Architecture & .env Differentiation Inspector -->
+  <div class="modal-overlay" id="arch-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="modal-badge">Architecture & Security Blueprint</span>
+          <h3>Frontend vs Backend vs Supabase & .env Files</h3>
+        </div>
+        <button class="modal-close" data-close="arch-modal">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="modal-desc">
+          This application implements clean separation between <strong>Frontend Client</strong>, <strong>Backend Proxy</strong>, and <strong>Supabase Database</strong>.
+        </p>
+
+        <!-- Visual Flow Diagram -->
+        <div class="arch-diagram">
+          <div class="diag-node diag-client">
+            <div class="node-icon">💻</div>
+            <h4>Frontend (Client)</h4>
+            <span class="node-file">/frontend/ &bull; frontend/.env</span>
+            <ul>
+              <li>Vanilla HTML5, CSS3, ES6 JS</li>
+              <li>Markdown & Code Rendering</li>
+              <li>Calls <code>POST /api/chat</code></li>
+              <li>Uses <code>SUPABASE_ANON_KEY</code> (safe for browser with RLS)</li>
+              <li class="danger-note">❌ Never holds Gemini Key or Service Role Key</li>
+            </ul>
+          </div>
+
+          <div class="diag-arrow-col">
+            <span class="diag-arrow-label">REST / SSE Stream</span>
+            <div class="diag-arrow">&harr;</div>
+            <span class="diag-arrow-sub">Port 5000</span>
+          </div>
+
+          <div class="diag-node diag-server">
+            <div class="node-icon">🛡️</div>
+            <h4>Backend (Server)</h4>
+            <span class="node-file">/backend/ &bull; backend/.env</span>
+            <ul>
+              <li>Node.js + Express API</li>
+              <li>Stores <code>GEMINI_API_KEY</code></li>
+              <li>Stores <code>SUPABASE_SERVICE_ROLE_KEY</code></li>
+              <li>Official <code>@google/genai</code> SDK</li>
+              <li class="safe-note">🔒 True security boundary</li>
+            </ul>
+          </div>
+
+          <div class="diag-arrow-col">
+            <span class="diag-arrow-label">PostgreSQL / GenAI</span>
+            <div class="diag-arrow">&harr;</div>
+            <span class="diag-arrow-sub">TLS Encrypted</span>
+          </div>
+
+          <div class="diag-node diag-gemini">
+            <div class="node-icon">✨ / 🗄️</div>
+            <h4>Cloud Services</h4>
+            <span class="node-file">Gemini & Supabase</span>
+            <ul>
+              <li><strong>Gemini 2.5:</strong> Real-time token generation & reasoning</li>
+              <li><strong>Supabase:</strong> <code>chat_sessions</code> & <code>chat_messages</code></li>
+              <li>Row Level Security (RLS)</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- .env Comparison Matrix -->
+        <div class="comparison-section">
+          <h4>Required Environment Variables Breakdown</h4>
+          <table class="diff-table">
+            <thead>
+              <tr>
+                <th>Scope</th>
+                <th>File Path</th>
+                <th>Variables Included</th>
+                <th>Security Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Frontend</strong></td>
+                <td><code>frontend/.env</code></td>
+                <td>
+                  <code>BACKEND_URL</code><br>
+                  <code>SUPABASE_URL</code><br>
+                  <code>SUPABASE_ANON_KEY</code>
+                </td>
+                <td><span style="color:#60a5fa;">Public / Browser-safe (Protected via Supabase RLS)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Backend</strong></td>
+                <td><code>backend/.env</code></td>
+                <td>
+                  <code>GEMINI_API_KEY</code><br>
+                  <code>PORT</code><br>
+                  <code>DEFAULT_MODEL</code><br>
+                  <code>SUPABASE_URL</code><br>
+                  <code>SUPABASE_ANON_KEY</code><br>
+                  <code>SUPABASE_SERVICE_ROLE_KEY</code>
+                </td>
+                <td><span style="color:#ef4444; font-weight: 600;">Confidential / Server-Only (Never exposed to browser)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-close="arch-modal">Got it, close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Settings & Configurations (Gemini & Supabase) -->
+  <div class="modal-overlay" id="settings-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="modal-badge">Configuration</span>
+          <h3>Gemini & Supabase Settings</h3>
+        </div>
+        <button class="modal-close" data-close="settings-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Backend & Supabase Status Cards -->
+        <div class="status-cards-grid">
+          <div class="status-card" id="backend-status-card">
+            <div class="status-info">
+              <div class="status-indicator-lg" id="server-dot"></div>
+              <div>
+                <h5 id="server-status-title">Checking Backend...</h5>
+                <p id="server-status-desc">Port 5000</p>
+              </div>
+            </div>
+            <button id="refresh-status-btn" class="btn btn-secondary btn-sm">Refresh</button>
+          </div>
+
+          <div class="status-card" id="supabase-status-card">
+            <div class="status-info">
+              <div class="status-indicator-lg" id="supabase-dot"></div>
+              <div>
+                <h5 id="supabase-status-title">Supabase Database</h5>
+                <p id="supabase-status-desc">Checking status...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-form">
+          <!-- Gemini Section -->
+          <div class="form-section-header">🤖 Gemini AI Configuration</div>
+
+          <div class="setting-group">
+            <label for="override-api-key">Gemini API Key</label>
+            <p class="setting-hint">
+              Configured via <code>backend/.env</code> (<code>GEMINI_API_KEY</code>) or override here:
+            </p>
+            <div class="input-with-button">
+              <input type="password" id="override-api-key" placeholder="AIzaSy..." autocomplete="off">
+              <button type="button" id="toggle-key-visibility" class="btn-icon">👁️</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label for="system-instruction">Custom System Instructions (Persona)</label>
+            <textarea id="system-instruction" rows="2" placeholder="You are Nexus, an expert assistant..."></textarea>
+          </div>
+
+          <!-- Supabase Section -->
+          <div class="form-section-header">🗄️ Supabase PostgreSQL Configuration</div>
+          <p class="setting-hint">
+            To enable database persistence, set these in <code>backend/.env</code> and <code>frontend/.env</code>, and run <a href="file:///c:/Users/siri/OneDrive/Desktop/test/supabase_schema.sql" target="_blank" style="color:#8bb2ff;">supabase_schema.sql</a> in your Supabase SQL Editor.
+          </p>
+
+          <div class="setting-group">
+            <label for="supabase-url-input">Supabase Project URL</label>
+            <input type="text" id="supabase-url-input" placeholder="https://your-project.supabase.co" autocomplete="off">
+          </div>
+
+          <div class="setting-group">
+            <label for="supabase-key-input">Supabase Anon Key</label>
+            <input type="password" id="supabase-key-input" placeholder="eyJhbGciOiJIUzI1NiIsIn..." autocomplete="off">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="clear-key-btn">Clear Local Overrides</button>
+        <button class="btn btn-primary" id="save-settings-btn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "gemini-fullstack-chatbot",
+  "version": "1.0.0",
+  "description": "Full-stack Google Gemini chatbot demonstrating decoupled frontend client and backend proxy architecture.",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "server": "node backend/server.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:setup": "node scripts/migrate.js",
+    "install:backend": "cd backend && npm install"
+  },
+  "keywords": [
+    "gemini",
+    "ai",
+    "chatbot",
+    "llm",
+    "google-genai",
+    "full-stack",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT"
+}
